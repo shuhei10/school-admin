@@ -2,11 +2,10 @@ import "express-session";
 
 declare module "express-session" {
   interface SessionData {
-    user?: {
+    user: {
       id: number;
-      email: string;
-      name: string;
+      username: string;
       role: "admin" | "instructor" | "student";
-    };
+    } | null;
   }
 }

@@ -23,8 +23,8 @@ r.post("/login", async (req, res) => {
   const ok = await bcrypt.compare(password, u.password_hash);
   if (!ok) return res.status(401).json({ ok: false, message: "Invalid credentials" });
 
-  req.session.user = { id: u.id, email: u.email, name: u.name, role: u.role };
-  res.json({ ok: true, user: req.session.user });
+  (req.session as any).user = { id: u.id, email: u.email, name: u.name, role: u.role };
+  res.json({ ok: true, user: (req.session as any).user });
 });
 
 r.post("/logout", (req, res) => {
