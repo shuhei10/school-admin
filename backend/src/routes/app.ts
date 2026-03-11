@@ -15,13 +15,20 @@ app.use(express.json());
 const allowedOrigins = new Set([
   "http://localhost:5173",
   "http://localhost:5174",
+  "https://51cd9536.school-admin-4gm.pages.dev",
 ]);
 
 app.use(
   cors({
     origin: (origin, cb) => {
+      // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return cb(null, true);
-      return cb(null, allowedOrigins.has(origin));
+      
+      if (allowedOrigins.has(origin)) {
+        return cb(null, true);
+      } else {
+        return cb(new Error("Not allowed by CORS"));
+      }
     },
     credentials: true,
   }),
