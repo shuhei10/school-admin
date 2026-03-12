@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import session from "express-session";
 
 import authRoutes from "./auth";
@@ -11,8 +10,6 @@ import coursesRoutes from "./courses";
 export const app = express();
 app.set("trust proxy", 1); 
 
-app.use(express.json());
-
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
@@ -20,20 +17,25 @@ const allowedOrigins = [
   "https://school-admin-4gm.pages.dev",
 ];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    optionsSuccessStatus: 200, // Necessary for some legacy browsers and preflight handling
-  }),
-);
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,PATCH,DELETE,POST,PUT");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+  );
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+  next();
+});
+
+app.use(express.json());
 
 app.use(
   session({
