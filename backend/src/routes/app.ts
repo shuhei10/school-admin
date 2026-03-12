@@ -13,24 +13,25 @@ app.set("trust proxy", 1);
 
 app.use(express.json());
 
-const allowedOrigins = new Set([
+const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "https://51cd9536.school-admin-4gm.pages.dev",
   "https://school-admin-4gm.pages.dev",
-]);
+];
 
 app.use(
   cors({
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true);
-      if (allowedOrigins.has(origin)) {
-        return cb(null, true);
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
       } else {
-        return cb(new Error("Not allowed by CORS"));
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
+    optionsSuccessStatus: 200, // Necessary for some legacy browsers and preflight handling
   }),
 );
 
