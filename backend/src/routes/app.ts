@@ -9,6 +9,7 @@ import studentsRoutes from "./students";
 import coursesRoutes from "./courses";
 
 export const app = express();
+app.set("trust proxy", 1); 
 
 app.use(express.json());
 
