@@ -9,6 +9,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true
   },
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  },
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",

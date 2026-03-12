@@ -5,11 +5,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
+    "dev": "tsx watch ./src/server.ts",
     "build": "tsc",
-    "start": "ts-node src/server.ts",
-    "init-db": "ts-node scripts/init-db.ts",
-    "migrate-db": "ts-node scripts/migrate-columns.ts"
+    "start": "tsx src/server.ts",
+    "init-db": "tsx scripts/init-db.ts",
+    "migrate-db": "tsx scripts/migrate-columns.ts"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,7 @@
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "mariadb": "^3.5.1",
+    "tsx": "^4.7.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
