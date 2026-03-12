@@ -7,6 +7,10 @@ import meRoutes from "./me.js";
 import dashboardRoutes from "./dashboard.js";
 import studentsRoutes from "./students.js";
 import coursesRoutes from "./courses.js";
+import { ensureSchema } from "../db.js";
+
+// Run schema check on startup
+ensureSchema();
 
 export const app = express();
 app.set("trust proxy", 1); 

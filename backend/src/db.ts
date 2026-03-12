@@ -14,12 +14,36 @@ export const pool = createPool({
   password: process.env.DB_PASSWORD || "password",
   database: process.env.DB_DATABASE || "school_admin",
   connectionLimit: 15,
-  connectTimeout: 20000, // 20 seconds
-  acquireTimeout: 20000, // 20 seconds
+  connectTimeout: 20000,
+  acquireTimeout: 20000,
   ssl: {
     rejectUnauthorized: false
   },
   allowPublicKeyRetrieval: true
 });
+
+export async function ensureSchema() {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    console.log("Checking database schema...");
+    const columns = await conn.query("SHOW COLUMNS FROM users");
+    const existing = columns.map((c: any) => (c.Field || c.field).toLowerCase());
+
+    if (!existing.includes("goal")) {
+      console.log("Adding missing column: goal");
+      await conn.query("ALTER TABLE users ADD COLUMN goal VARCHAR(255) NULL AFTER status");
+    }
+    if (!existing.includes("skill_level")) {
+      console.log("Adding missing column: skill_level");
+      await conn.query("ALTER TABLE users ADD COLUMN skill_level VARCHAR(100) NULL AFTER goal");
+    }
+    console.log("Schema check completed.");
+  } catch (err) {
+    console.error("Schema check failed:", err);
+  } finally {
+    if (conn) conn.release();
+  }
+}
 
 
