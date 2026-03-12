@@ -39,10 +39,63 @@ export async function ensureSchema() {
       await conn.query("ALTER TABLE users ADD COLUMN skill_level VARCHAR(100) NULL AFTER goal");
     }
     console.log("Schema check completed.");
+    await ensureSeedData(conn); // Pass connection to seed
   } catch (err) {
     console.error("Schema check failed:", err);
   } finally {
     if (conn) conn.release();
+  }
+}
+
+async function ensureSeedData(conn: any) {
+  try {
+    const [courseCount] = await conn.query("SELECT COUNT(*) as count FROM courses");
+    if (courseCount.count > 0) {
+      console.log("Courses already exist, skipping seeding.");
+      return;
+    }
+
+    console.log("Database empty. Seeding initial content...");
+
+    // 1. Course
+    const resCourse = await conn.query(
+      "INSERT INTO courses (title, description, is_published) VALUES (?, ?, ?)",
+      ["はじめてのWeb開発入門", "HTML, CSS, JavaScriptの基礎からWeb開発を学ぶコースです。", 1]
+    );
+    const courseId = Number(resCourse.insertId);
+
+    // 2. Chapters
+    const resChapter1 = await conn.query(
+      "INSERT INTO course_chapters (course_id, title, order_index) VALUES (?, ?, ?)",
+      [courseId, "導入：Webの仕組み", 1]
+    );
+    const chapter1Id = Number(resChapter1.insertId);
+
+    const resChapter2 = await conn.query(
+      "INSERT INTO course_chapters (course_id, title, order_index) VALUES (?, ?, ?)",
+      [courseId, "実践：HTML/CSS", 2]
+    );
+    const chapter2Id = Number(resChapter2.insertId);
+
+    // 3. Lessons
+    await conn.query(
+      "INSERT INTO course_lessons (chapter_id, title, content, video_url, order_index) VALUES (?, ?, ?, ?, ?)",
+      [chapter1Id, "インターネットとは？", "Webの歴史と基本概念について学びます。", "https://www.youtube.com/embed/placeholder1", 1]
+    );
+
+    await conn.query(
+      "INSERT INTO course_lessons (chapter_id, title, content, video_url, order_index) VALUES (?, ?, ?, ?, ?)",
+      [chapter2Id, "HTMLタグの基礎", "様々なタグの使い方を実践形式で学びます。", "https://www.youtube.com/embed/placeholder2", 1]
+    );
+
+    await conn.query(
+      "INSERT INTO course_lessons (chapter_id, title, content, video_url, order_index) VALUES (?, ?, ?, ?, ?)",
+      [chapter2Id, "CSSでデザインを整える", "レイアウトの基本と装飾について学びます。", "https://www.youtube.com/embed/placeholder3", 2]
+    );
+
+    console.log("✅ Initial seeding completed successfully!");
+  } catch (err) {
+    console.error("❌ Seeding failed:", err);
   }
 }
 
