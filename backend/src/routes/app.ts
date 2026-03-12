@@ -16,14 +16,13 @@ const allowedOrigins = new Set([
   "http://localhost:5173",
   "http://localhost:5174",
   "https://51cd9536.school-admin-4gm.pages.dev",
+  "https://school-admin-4gm.pages.dev",
 ]);
 
 app.use(
   cors({
     origin: (origin, cb) => {
-      // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return cb(null, true);
-      
       if (allowedOrigins.has(origin)) {
         return cb(null, true);
       } else {
@@ -40,10 +39,11 @@ app.use(
     secret: process.env.SESSION_SECRET ?? "dev-secret",
     resave: false,
     saveUninitialized: false,
+    proxy: true, // Required for Vercel/proxies
     cookie: {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false,
+      sameSite: "none", // Required for cross-site
+      secure: true,     // Required for sameSite: none
       maxAge: 1000 * 60 * 60 * 8,
     },
   }),

@@ -1,6 +1,7 @@
 import { pool } from "../src/db";
 import fs from "fs";
 import path from "path";
+import bcrypt from "bcrypt";
 
 async function init() {
   console.log("Starting database initialization on Aiven...");
@@ -9,7 +10,6 @@ async function init() {
     const sqlPath = path.join(__dirname, "../sql/001_init.sql");
     const sql = fs.readFileSync(sqlPath, "utf8");
     
-    // Split by semicolon but be careful with strings (simple split for this script)
     const statements = sql
       .split(";")
       .map(s => s.trim())
@@ -20,7 +20,15 @@ async function init() {
       await pool.query(statement);
     }
 
-    console.log("✅ Database initialized successfully!");
+    // Insert Admin User securely
+    const hashedPassword = await bcrypt.hash("pass1234", 10);
+    console.log("Inserting admin user...");
+    await pool.query(
+      "INSERT INTO users (email, password_hash, name, role, status) VALUES (?, ?, ?, ?, ?)",
+      ["admin@example.com", hashedPassword, "管理者ユーザー", "admin", "active"]
+    );
+
+    console.log("✅ Database and Admin user initialized successfully!");
   } catch (err) {
     console.error("❌ Error initializing database:", err);
   } finally {
