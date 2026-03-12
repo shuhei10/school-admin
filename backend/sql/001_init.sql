@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS school_admin;
-USE school_admin;
+-- CREATE DATABASE IF NOT EXISTS school_admin;
+-- USE school_admin;
 
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
