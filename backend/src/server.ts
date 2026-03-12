@@ -1,4 +1,4 @@
-import { app } from "./routes/app";
+import { app } from "./routes/app.js";
 
 const PORT = Number(process.env.PORT ?? 3001);
 

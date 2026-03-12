@@ -1,13 +1,17 @@
-import { pool } from "../src/db";
+import { pool } from "../src/db.js";
 import fs from "fs";
 import path from "path";
 import bcrypt from "bcrypt";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function init() {
   console.log("Starting database initialization on Aiven...");
   
   try {
-    const sqlPath = path.join(__dirname, "../sql/001_init.sql");
+    const sqlPath = path.resolve(__dirname, "../../sql/001_init.sql");
     const sql = fs.readFileSync(sqlPath, "utf8");
     
     const statements = sql

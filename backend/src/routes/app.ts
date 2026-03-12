@@ -2,11 +2,11 @@ import express from "express";
 import cors from "cors";
 import session from "express-session";
 
-import authRoutes from "./auth";
-import meRoutes from "./me";
-import dashboardRoutes from "./dashboard";
-import studentsRoutes from "./students";
-import coursesRoutes from "./courses";
+import authRoutes from "./auth.js";
+import meRoutes from "./me.js";
+import dashboardRoutes from "./dashboard.js";
+import studentsRoutes from "./students.js";
+import coursesRoutes from "./courses.js";
 
 export const app = express();
 app.set("trust proxy", 1); 
