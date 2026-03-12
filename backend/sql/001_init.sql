@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS course_lessons (
   title VARCHAR(200) NOT NULL,
   content TEXT NULL,
   video_url VARCHAR(500) NULL,
+  order_index INT NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (chapter_id) REFERENCES course_chapters(id) ON DELETE CASCADE
 );
