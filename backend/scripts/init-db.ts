@@ -1,7 +1,7 @@
 import { pool } from "../src/db.js";
 import fs from "fs";
 import path from "path";
-import bcrypt from "bcrypt";
+import * as bcrypt from "bcrypt";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
