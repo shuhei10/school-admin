@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import session from "express-session";
 
 import authRoutes from "./auth";
@@ -9,6 +10,18 @@ import coursesRoutes from "./courses";
 
 export const app = express();
 app.set("trust proxy", 1); 
+
+app.use(
+  cors({
+    origin: [
+      "https://school-admin-4gm.pages.dev",
+      "https://51cd9536.school-admin-4gm.pages.dev",
+      "http://localhost:5173"
+    ],
+    credentials: true,
+    optionsSuccessStatus: 200,
+  })
+);
 
 app.use(express.json());
 
