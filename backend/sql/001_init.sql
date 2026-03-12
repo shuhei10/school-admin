@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
   name VARCHAR(100) NOT NULL,
   role ENUM('admin','instructor','student') NOT NULL,
   status ENUM('active','inactive') NOT NULL DEFAULT 'active',
+  goal VARCHAR(255) NULL,
+  skill_level VARCHAR(100) NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
