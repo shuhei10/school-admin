@@ -61,10 +61,11 @@ app.use("/api/courses", coursesRoutes);
 
 // 静的ファイルの配信 (Vercelデプロイ時の配布用)
 // backend/public に frontend/dist をコピーしたものが入っている前提
-app.use(express.static(path.resolve(__dirname, "../../public")));
+const publicPath = path.resolve(process.cwd(), "public");
+app.use(express.static(publicPath));
 
 // API以外のリクエストはindex.htmlに返す (SPA)
 app.get("*", (req, res, next) => {
   if (req.path.startsWith("/api")) return next();
-  res.sendFile(path.resolve(__dirname, "../../public/index.html"));
+  res.sendFile(path.resolve(publicPath, "index.html"));
 });
