@@ -55,48 +55,55 @@ async function ensureSeedData(conn: any) {
       return;
     }
 
-    console.log("Database empty. Seeding initial content...");
+    console.log("Database empty. Seeding provided content...");
 
-    // 1. Course
-    const resCourse = await conn.query(
-      "INSERT INTO courses (title, description, is_published) VALUES (?, ?, ?)",
-      ["はじめてのWeb開発入門", "HTML, CSS, JavaScriptの基礎からWeb開発を学ぶコースです。", 1]
-    );
-    const courseId = Number(resCourse.insertId);
+    // 1. Courses
+    await conn.query(`
+      INSERT INTO courses (id, title, description, is_published, created_at) VALUES 
+      (1, 'はじめてのWebデザインコース', 'Webデザインがまったく初めての方向けに、HTML/CSSの基本から、簡単な1ページサイトの制作までを丁寧に指導します。', 1, '2026-03-05 21:50:23'),
+      (2, '実践型フリーランスコース', '基礎を終えた方、または自己学習で少し触れたことがある方向け。実際の案件に近い課題や、Figmaを用いたUI設計、レスポンシブ対応コーディングを通して、仕事で使える力を養います。', 1, '2026-03-05 21:50:23')
+    `);
 
     // 2. Chapters
-    const resChapter1 = await conn.query(
-      "INSERT INTO course_chapters (course_id, title, order_index) VALUES (?, ?, ?)",
-      [courseId, "導入：Webの仕組み", 1]
-    );
-    const chapter1Id = Number(resChapter1.insertId);
-
-    const resChapter2 = await conn.query(
-      "INSERT INTO course_chapters (course_id, title, order_index) VALUES (?, ?, ?)",
-      [courseId, "実践：HTML/CSS", 2]
-    );
-    const chapter2Id = Number(resChapter2.insertId);
+    await conn.query(`
+      INSERT INTO course_chapters (id, course_id, title, order_index, created_at) VALUES 
+      (1, 2, 'フリーランスとしてのマインドセット', 0, '2026-03-11 19:57:00'),
+      (2, 2, '案件獲得のステップ', 1, '2026-03-11 19:57:00'),
+      (3, 1, 'Webデザインの基礎', 0, '2026-03-11 19:57:30'),
+      (4, 1, 'Figmaの使い方', 1, '2026-03-11 19:57:30'),
+      (5, 1, 'HTML/CSSコーディング', 2, '2026-03-11 19:57:30'),
+      (6, 2, 'フリーランスとしてのマインドセット', 0, '2026-03-11 19:57:30'),
+      (7, 2, '案件獲得のステップ', 1, '2026-03-11 19:57:30')
+    `);
 
     // 3. Lessons
-    await conn.query(
-      "INSERT INTO course_lessons (chapter_id, title, content, video_url, order_index) VALUES (?, ?, ?, ?, ?)",
-      [chapter1Id, "インターネットとは？", "Webの歴史と基本概念について学びます。", "https://www.youtube.com/embed/placeholder1", 1]
-    );
+    await conn.query(`
+      INSERT INTO course_lessons (id, chapter_id, title, content, video_url, order_index, created_at) VALUES 
+      (1, 1, '自己管理術', 'タスク管理やモチベーション維持について。', NULL, 0, '2026-03-11 19:57:00'),
+      (2, 2, 'ポートフォリオの作り方', '魅力的な実績の見せ方。', NULL, 0, '2026-03-11 19:57:00'),
+      (3, 2, '営業メールの書き方', 'クライアントへのアプローチ方法。', NULL, 1, '2026-03-11 19:57:00'),
+      (4, 3, 'Webとは何か？', 'Webの仕組みについて学びます。', NULL, 0, '2026-03-11 19:57:30'),
+      (5, 3, 'デザインの4原則', '近接、整列、反復、コントラストを理解しましょう。', NULL, 1, '2026-03-11 19:57:30'),
+      (6, 4, 'Figmaの基本操作', 'ツールの使い方を学びます。', NULL, 0, '2026-03-11 19:57:30'),
+      (7, 5, 'HTMLの基本タグ', 'h1, p, div, spanなどの使い方。', NULL, 0, '2026-03-11 19:57:30'),
+      (8, 6, '自己管理術', 'タスク管理やモチベーション維持について。', NULL, 0, '2026-03-11 19:57:30'),
+      (9, 7, 'ポートフォリオの作り方', '魅力的な実績の見せ方。', NULL, 0, '2026-03-11 19:57:30'),
+      (10, 7, '営業メールの書き方', 'クライアントへのアプローチ方法。', NULL, 1, '2026-03-11 19:57:30')
+    `);
 
-    await conn.query(
-      "INSERT INTO course_lessons (chapter_id, title, content, video_url, order_index) VALUES (?, ?, ?, ?, ?)",
-      [chapter2Id, "HTMLタグの基礎", "様々なタグの使い方を実践形式で学びます。", "https://www.youtube.com/embed/placeholder2", 1]
-    );
+    // 4. Students & Enrollments (Special: ensure students exist for user 2 and 3)
+    // Check if students exist first
+    const [sc] = await conn.query("SELECT COUNT(*) as count FROM students");
+    if (sc.count === 0) {
+      await conn.query(`INSERT IGNORE INTO students (id, user_id) VALUES (1, 2), (2, 3)`);
+      await conn.query(`
+        INSERT IGNORE INTO enrollments (student_id, course_id, status) VALUES 
+        (1, 1, 'active'), (1, 2, 'active'), (2, 1, 'active'), (2, 2, 'active')
+      `);
+    }
 
-    await conn.query(
-      "INSERT INTO course_lessons (chapter_id, title, content, video_url, order_index) VALUES (?, ?, ?, ?, ?)",
-      [chapter2Id, "CSSでデザインを整える", "レイアウトの基本と装飾について学びます。", "https://www.youtube.com/embed/placeholder3", 2]
-    );
-
-    console.log("✅ Initial seeding completed successfully!");
+    console.log("✅ Seed data populated successfully!");
   } catch (err) {
     console.error("❌ Seeding failed:", err);
   }
 }
-
-
