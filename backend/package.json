@@ -9,7 +9,8 @@
     "build": "tsc",
     "start": "tsx src/server.ts",
     "init-db": "tsx scripts/init-db.ts",
-    "migrate-db": "tsx scripts/migrate-columns.ts"
+    "migrate-db": "tsx scripts/migrate-columns.ts",
+    "check-db": "tsx scripts/check_db.ts"
   },
   "keywords": [],
   "author": "",

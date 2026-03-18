@@ -38,8 +38,8 @@ app.use(
     proxy: true, // Required for Vercel/proxies
     cookie: {
       httpOnly: true,
-      sameSite: "none", // Required for cross-site
-      secure: true,     // Required for sameSite: none
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: 1000 * 60 * 60 * 8,
     },
   }),

@@ -12,12 +12,26 @@ const adminOnly = [requireAuth, requireRole(["admin"])];
 // 一覧取得
 r.get("/", requireAuth, requireRole(["admin", "instructor"]), async (_req, res) => {
   const rows = await pool.query(
-    `SELECT s.id, u.name, u.email, u.status, u.goal, u.skill_level, s.created_at
-     FROM students s
-     JOIN users u ON u.id = s.user_id
-     ORDER BY s.id DESC`
+    `SELECT 
+       u.id AS user_id, 
+       s.id AS student_id, 
+       u.name, 
+       u.email, 
+       u.status, 
+       u.goal, 
+       u.skill_level, 
+       s.created_at
+     FROM users u
+     LEFT JOIN students s ON u.id = s.user_id
+     WHERE u.role = 'student'
+     ORDER BY u.id DESC`
   );
-  res.json({ ok: true, students: rows });
+  // フロントエンドとの互換性のために、s.id を id として扱う（無い場合は null）
+  const students = rows.map((r: any) => ({
+    ...r,
+    id: r.student_id || `temp-${r.user_id}` 
+  }));
+  res.json({ ok: true, students });
 });
 
 // 特定の学生の進捗取得
