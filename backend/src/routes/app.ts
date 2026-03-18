@@ -7,7 +7,12 @@ import meRoutes from "./me.js";
 import dashboardRoutes from "./dashboard.js";
 import studentsRoutes from "./students.js";
 import coursesRoutes from "./courses.js";
+import path from "path";
+import { fileURLToPath } from "url";
 import { ensureSchema } from "../db.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Run schema check on startup
 ensureSchema();
@@ -20,6 +25,7 @@ app.use(
     origin: [
       "https://school-admin-4gm.pages.dev",
       "https://51cd9536.school-admin-4gm.pages.dev",
+      "https://school-admin-phi.vercel.app",
       "http://localhost:5173"
     ],
     credentials: true,
@@ -52,3 +58,13 @@ app.use("/api/me", meRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/students", studentsRoutes);
 app.use("/api/courses", coursesRoutes);
+
+// 静的ファイルの配信 (Vercelデプロイ時の配布用)
+// backend/public に frontend/dist をコピーしたものが入っている前提
+app.use(express.static(path.resolve(__dirname, "../../public")));
+
+// API以外のリクエストはindex.htmlに返す (SPA)
+app.get("*", (req, res, next) => {
+  if (req.path.startsWith("/api")) return next();
+  res.sendFile(path.resolve(__dirname, "../../public/index.html"));
+});
